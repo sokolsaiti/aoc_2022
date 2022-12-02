@@ -1,4 +1,4 @@
-defmodule Day1 do
+defmodule Aoc2022.Day1 do
   @moduledoc """
   Documentation for `Day1`.
 

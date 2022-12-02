@@ -1,8 +1,14 @@
 defmodule Aoc2022Test do
   use ExUnit.Case
-  doctest Aoc2022
+  alias Aoc2022.Day1
 
-  test "greets the world" do
-    assert Aoc2022.hello() == :world
+  test "Day 1 - Step 1" do
+    %{max: m, top3: _} = Day1.process_input()
+    assert m == 68775
+  end
+
+  test "Day 1 - Step 2" do
+    %{max: _, top3: t} = Day1.process_input()
+    assert t == 202_585
   end
 end
