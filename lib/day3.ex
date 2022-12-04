@@ -10,7 +10,16 @@ defmodule Aoc_2022.Day3 do
       end)
       |> Enum.map(fn {a, b} ->
         MapSet.intersection(MapSet.new(String.graphemes(a)), MapSet.new(String.graphemes(b)))
+        |> MapSet.to_list()
       end)
+      |> List.flatten()
+      |> Enum.map(fn x ->
+        Enum.find_index(
+          String.graphemes("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+          fn y -> y == x end
+        ) + 1
+      end)
+      |> Enum.sum()
 
     rucksacks
   end
