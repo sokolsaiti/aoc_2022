@@ -15,36 +15,30 @@ defmodule Aoc2022.Day2 do
       content
       |> String.split("\r\n")
       |> Enum.map(fn x ->
-        translate(x, :all)
+        translate(x)
       end)
-      |> Enum.map(fn x -> %{x | result: who_won?(x)} end)
-      |> Enum.map(fn %{:m => _, :o => _, :result => r, :shape_value => v} -> r + v end)
+      |> Enum.map(fn x ->
+        {:ok, me} = Map.fetch(x, :m)
+        who_won?(x) + get_value(me)
+      end)
       |> Enum.sum()
 
     step2_result =
       content
       |> String.split("\r\n")
       |> Enum.map(fn x ->
-        translate(x, :oponent_only)
+        translate(x)
       end)
       |> Enum.map(fn x ->
-        {:ok, oponent_shape} = Map.fetch(x, :o)
-        {:ok, my_instruction} = Map.fetch(x, :m)
-        IO.inspect(x)
-        y = %{x | m: transform_my_shape(oponent_shape, my_instruction)}
-        IO.inspect(y)
-        %{y | shape_value: get_value(transform_my_shape(oponent_shape, my_instruction))}
-      end)
-      |> Enum.map(fn x -> %{x | result: who_won?(x)} end)
-      |> IO.inspect()
-      |> Enum.map(fn %{:m => _, :o => _, :result => r, :shape_value => v} -> r + v end)
-      |> Enum.filter(fn %{:m => me, :o => oponent, :result => r, :shape_value => v} ->
-        me == oponent
-      end)
+        {:ok, oponent} = Map.fetch(x, :o)
+        {:ok, instruction} = Map.fetch(x, :instruction)
 
-    # |> Enum.sum()
+        who_won?(%{m: strategy(oponent, instruction), o: oponent}) +
+          get_value(strategy(oponent, instruction))
+      end)
+      |> Enum.sum()
 
-    step2_result
+    {step1_result, step2_result}
   end
 
   def who_won?(%{m: :scissors, o: :paper}) do
@@ -67,7 +61,7 @@ defmodule Aoc2022.Day2 do
     0
   end
 
-  def translate(guide, :all) do
+  def translate(guide) do
     [oponent, me] = String.split(guide, " ")
 
     %{
@@ -75,36 +69,22 @@ defmodule Aoc2022.Day2 do
       m: translate_input(me),
       result: 0,
       shape_value: get_value(translate_input(me)),
-      original_shape: translate_input(me),
-      instruction: me
-    }
-  end
-
-  def translate(guide, :oponent_only) do
-    [oponent, me] = String.split(guide, " ")
-
-    %{
-      o: translate_input(oponent),
-      m: me,
-      result: 0,
-      shape_value: get_value(translate_input(me)),
-      original_shape: translate_input(me),
       instruction: me
     }
   end
 
   # draw
-  def transform_my_shape(oponent, "Y") do
+  def strategy(oponent, "Y") do
     oponent
   end
 
-  # loose
-  def transform_my_shape(oponent, "X") do
+  # lose
+  def strategy(oponent, "X") do
     lose(oponent)
   end
 
   # win
-  def transform_my_shape(oponent, "Z") do
+  def strategy(oponent, "Z") do
     win(oponent)
   end
 
@@ -121,15 +101,15 @@ defmodule Aoc2022.Day2 do
   end
 
   defp lose(:paper) do
-    :scissors
+    :rock
   end
 
   defp lose(:rock) do
-    :paper
+    :scissors
   end
 
   defp lose(:scissors) do
-    :rock
+    :paper
   end
 
   defp get_value(:rock) do
