@@ -5,7 +5,7 @@ defmodule Aoc2022.MixProject do
     [
       app: :aoc_2022,
       version: "0.1.0",
-      elixir: "~> 1.14.1",
+      elixir: "~> 1.13.4",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]

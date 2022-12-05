@@ -4,13 +4,20 @@ defmodule Aoc2022.Day5 do
 
     [initial_state_content, instructions] =
     content
-    |> String.split("\r\n\r\n")
+    |> String.split("\n\n")
 
-    initial_state =
+    {buckets_row, stacks} =
     initial_state_content
-    |> String.split("\r\n")
-    |> Enum.map()
+    |> String.split("\n")
+    |> Enum.reverse()
+    |> List.pop_at(0)
 
-    initial_state
+    stack_buckets =
+    buckets_row
+    |> String.split(" ",trim: true)
+    |> Map.new(fn x -> {x,[]} end)
+
+    stack_buckets
+
   end
 end
