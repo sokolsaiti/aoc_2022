@@ -1,4 +1,13 @@
 defmodule Aoc2022.Day3 do
+
+    @moduledoc """
+  Documentation for `Day 3`.
+
+  --- Day 3: Rucksack Reorganization ---
+
+  https://adventofcode.com/2022/day/3
+
+  """
   def process_input do
     {:ok, content} = File.read("./input/day3.txt")
 

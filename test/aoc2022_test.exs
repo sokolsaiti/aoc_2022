@@ -1,5 +1,6 @@
 defmodule Aoc2022Test do
   use ExUnit.Case
+  alias Aoc2022.Day4
   alias Aoc2022.Day2
   alias Aoc2022.Day1
   alias Aoc2022.Day3
@@ -24,5 +25,11 @@ defmodule Aoc2022Test do
     {step1, step2} = Day3.process_input()
     assert step1 == 7850
     assert step2 == 2581
+  end
+
+  test "Day 4" do
+    {step1, step2} = Day4.process_input()
+    assert step1 == 571
+    assert step2 == 917
   end
 end
