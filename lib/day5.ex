@@ -12,6 +12,10 @@ defmodule Aoc2022.Day5 do
       |> Enum.reverse()
       |> List.pop_at(0)
 
+    parsed_instructions =
+      instructions
+      |> String.split("\r\n")
+
     stack_buckets =
       buckets_row
       |> String.split(" ", trim: true)
@@ -26,11 +30,19 @@ defmodule Aoc2022.Day5 do
       |> Enum.map(fn x -> Tuple.to_list(x) |> List.delete("") end)
       |> Enum.map(fn x -> x |> Enum.filter(fn y -> y != "" end) end)
 
-    stack_buckets
+    parsed_instructions
   end
 
   def parse_row("", acc) do
     Enum.reverse(acc)
+    # acc
+  end
+
+  def parse_instruction(instruction) do
+    %{"amount" => a, "from" => f, "to" => t} =
+      Regex.named_captures(~r{move (?<amount>\d+) from (?<from>\d+) to (?<to>\d+)}, instruction)
+
+    {String.to_integer(a), String.to_integer(f), String.to_integer(t)}
   end
 
   def parse_row(row, acc) do
@@ -38,6 +50,14 @@ defmodule Aoc2022.Day5 do
     acc = add_2_list(String.trim(col), acc)
 
     parse_row(rest, acc)
+  end
+
+  def move_out(list) do
+    List.pop_at(list, -1)
+  end
+
+  def move_in(list, box) do
+    List.insert_at(list, -1, box)
   end
 
   defp add_2_list(item, list) do
