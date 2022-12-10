@@ -26,6 +26,7 @@ defmodule Aoc2022.Day5 do
       |> String.split("\r\n")
       |> Enum.map(&parse_instruction/1)
 
+    move(parsed_instructions, parsed_stacks)
     move_n(parsed_instructions, parsed_stacks)
   end
 
@@ -45,11 +46,35 @@ defmodule Aoc2022.Day5 do
 
     dst = pick_stack(stacks, to - 1)
 
-    {new_src, new_dst} = move_box(src, dst, count)
+    {new_src, new_dst} = move_immediate(src, dst, count)
     inter_result = List.replace_at(stacks, to - 1, new_dst)
     result = List.replace_at(inter_result, from - 1, new_src)
 
     move_n(rest_of_instructions, result)
+  end
+
+  def move([], stacks) do
+    stacks
+  end
+
+  def move(instructions, stacks) do
+    {{count, from, to}, rest_of_instructions} = List.pop_at(instructions, 0)
+
+    src = pick_stack(stacks, from - 1)
+
+    dst = pick_stack(stacks, to - 1)
+
+    {new_src, new_dst} = move_box(src, dst, count)
+    inter_result = List.replace_at(stacks, to - 1, new_dst)
+    result = List.replace_at(inter_result, from - 1, new_src)
+
+    move(rest_of_instructions, result)
+  end
+
+  def move_immediate(from, to, count) do
+    boxes = Enum.take(from, -1 * count)
+    new_from = Enum.drop(from, -1 * count)
+    {new_from, to ++ boxes}
   end
 
   def move_box(from, to, 0) do
