@@ -2,7 +2,7 @@ defmodule Aoc2022.Day6 do
   @moduledoc """
   Documentation for `Day 6`.
 
-  --- Day 4: Camp Cleanup ---
+  --- Day 6: Tuning Trouble ---
 
   https://adventofcode.com/2022/day/6
 

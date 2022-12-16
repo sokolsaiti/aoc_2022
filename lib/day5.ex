@@ -3,7 +3,7 @@ defmodule Aoc2022.Day5 do
   @moduledoc """
   Documentation for `Day 5`.
 
-  --- Day 4: Camp Cleanup ---
+  --- Day 5: Supply Stacks ---
 
   https://adventofcode.com/2022/day/5
 
