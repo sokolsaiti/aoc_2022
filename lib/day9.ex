@@ -1,5 +1,5 @@
 defmodule Aoc2022.Day9 do
-  defstruct north: 0, east: 0, history: []
+  defstruct hy: 0, hx: 0, history: [], tx: 0, ty: 0, thistory: []
 
   def process_input do
     content =
@@ -15,43 +15,88 @@ defmodule Aoc2022.Day9 do
     content
   end
 
-  def move("D", steps, %__MODULE__{north: n, east: e, history: h} = rope) do
-    path = for x <- n..(n - steps), do: %{north: x, east: e}
+  def tail_follow(h) do
+    Enum.reverse(h)
+    |> Enum.reduce([{0, 0}], fn %{hx: hx, hy: hy}, [{x, y} | t] = acc ->
+      diff = {abs(hx) - abs(x), abs(hy) - abs(y)}
+
+      case diff do
+        {0, 0} ->
+          acc
+
+        {0, 1} ->
+          acc
+
+        {0, -1} ->
+          acc
+
+        {1, 0} ->
+          acc
+
+        {-1, 0} ->
+          acc
+
+        {0, 2} ->
+          [{x, y + 1} | acc]
+
+        {0, -2} ->
+          [{x, y - 1} | acc]
+
+        {2, 0} ->
+          [{x + 1, y} | acc]
+
+        {-2, 0} ->
+          [{x - 1, y} | acc]
+
+        {3, 1} ->
+          [{x + 2, y + 1} | acc]
+
+        {3, -1} ->
+          [{x + 2, y - 1} | acc]
+
+        {1, 3} ->
+          [{x + 1, y + 2} | acc]
+      end
+    end)
+  end
+
+  defp move("D", steps, %__MODULE__{hy: n, hx: e, history: h} = rope) do
+    path = for step <- n..(n - steps), do: %{hy: step, hx: e}
 
     %__MODULE__{
-      north: n - steps,
-      east: e,
-      history: Enum.drop(Enum.reverse(Enum.drop(path, 1)), 1) ++ h
+      hy: n - steps,
+      hx: e,
+      history: Enum.drop(Enum.reverse(path), 1) ++ h
     }
   end
 
-  def move("U", steps, %__MODULE__{north: n, east: e, history: h} = rope) do
-    path = for x <- n..(n + steps), do: %{north: x, east: e}
+  defp move("U", steps, %__MODULE__{hy: n, hx: e, history: h} = rope) do
+    path = for step <- n..(n + steps), do: %{hy: step, hx: e}
 
     %__MODULE__{
-      north: n + steps,
-      east: e,
-      history: Enum.drop(Enum.reverse(Enum.drop(path, 1)), 1) ++ h
+      hy: n + steps,
+      hx: e,
+      history: Enum.drop(Enum.reverse(path), 1) ++ h
     }
   end
 
-  def move("L", steps, %__MODULE__{north: n, east: e, history: h} = rope) do
-    path = for x <- e..(e - steps), do: %{north: n, east: x}
+  defp move("L", steps, %__MODULE__{hy: n, hx: e, history: h} = rope) do
+    path = for step <- e..(e - steps), do: %{hy: n, hx: step}
 
     %__MODULE__{
-      north: n,
-      east: e - steps,
-      history: Enum.drop(Enum.reverse(Enum.drop(path, 1)), 1) ++ h
+      hy: n,
+      hx: e - steps,
+      history: Enum.drop(Enum.reverse(path), 1) ++ h
     }
   end
 
-  def move("R", steps, %__MODULE__{north: n, east: e, history: h} = rope) do
-    path = for x <- e..(e + steps), do: %{north: n, east: x}
+  defp move("R", steps, %__MODULE__{hy: n, hx: e, history: h} = rope) do
+    path = for step <- e..(e + steps), do: %{hy: n, hx: step}
 
     %__MODULE__{
-      north: n,
-      east: e + steps,
-      history: Enum.drop(Enum.reverse(Enum.drop(path, 1)), 1) ++ h
+      hy: n,
+      hx: e + steps,
+      history: Enum.drop(Enum.reverse(path), 1) ++ h
     }
   end
 end
