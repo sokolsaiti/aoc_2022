@@ -3,7 +3,7 @@ defmodule Aoc2022.Day9 do
 
   def process_input do
     content =
-      File.stream!("./input/day9.txt")
+      File.stream!("./input/day9.2.txt")
       |> Enum.map(fn x ->
         [direction, steps] = String.split(x)
         {direction, String.to_integer(steps)}
@@ -12,15 +12,25 @@ defmodule Aoc2022.Day9 do
         move(direction, steps, acc)
       end)
 
-    content
+    %{hx: x, hy: y, history: h} = content
+
+    # tail_follow([%{hx: x, hy: y} | h])
+    IO.inspect(h)
+
+    IO.inspect(tail_follow(h))
+
+    tail_follow(h)
+    |> Enum.uniq()
+    |> Enum.count()
   end
 
   def tail_follow(h) do
     Enum.reverse(h)
-    |> Enum.reduce([{0, 0}], fn %{hx: hx, hy: hy}, [{x, y} | t] = acc ->
-      diff = {abs(hx) - abs(x), abs(hy) - abs(y)}
-
-      case diff do
+    |> Enum.reduce([{0, 0}], fn %{hx: hx, hy: hy}, [{x, y} | _] = acc ->
+      # diff = {abs(hx) - abs(x), abs(hy) - abs(y)}
+      # {hx - x, hy - y} 4805, 5152, 5751
+      #dbg()
+      case {abs(hx) - abs(x), abs(hy) - abs(y)} do
         {0, 0} ->
           acc
 
@@ -36,6 +46,22 @@ defmodule Aoc2022.Day9 do
         {-1, 0} ->
           acc
 
+        {-1, -1} ->
+          #[{x - 1, y} | acc]
+          acc
+
+        {1, -1} ->
+          #[{x + 1, y} | acc]
+          acc
+
+        {-1, 1} ->
+          #[{x - 1, y} | acc]
+          acc
+
+        {1, 1} ->
+          #[{x + 1, y} | acc]
+          acc
+
         {0, 2} ->
           [{x, y + 1} | acc]
 
@@ -48,55 +74,70 @@ defmodule Aoc2022.Day9 do
         {-2, 0} ->
           [{x - 1, y} | acc]
 
-        {3, 1} ->
-          [{x + 2, y + 1} | acc]
+        {2, 1} ->
+          [{x + 1, y + 1} | acc]
 
-        {3, -1} ->
-          [{x + 2, y - 1} | acc]
+        {2, -1} ->
+          [{x + 1, y - 1} | acc]
 
-        {1, 3} ->
-          [{x + 1, y + 2} | acc]
+        {-2, 1} ->
+          [{x - 1, y + 1} | acc]
+
+        {-2, -1} ->
+          [{x - 1, y - 1} | acc]
+
+        {1, 2} ->
+          [{x + 1, y + 1} | acc]
+
+        {1, -2} ->
+          [{x + 1, y - 1} | acc]
+
+        {-1, 2} ->
+          [{x - 1, y + 1} | acc]
+
+        {-1, -2} ->
+          [{x - 1, y - 1} | acc]
       end
     end)
   end
 
-  defp move("D", steps, %__MODULE__{hy: n, hx: e, history: h} = rope) do
+  defp move("D", steps, %__MODULE__{hy: n, hx: e, history: h}) do
     path = for step <- n..(n - steps), do: %{hy: step, hx: e}
 
     %__MODULE__{
       hy: n - steps,
       hx: e,
-      history: Enum.drop(Enum.reverse(path), 1) ++ h
+      history: Enum.reverse(path) ++ h
     }
   end
 
-  defp move("U", steps, %__MODULE__{hy: n, hx: e, history: h} = rope) do
+  defp move("U", steps, %__MODULE__{hy: n, hx: e, history: h}) do
     path = for step <- n..(n + steps), do: %{hy: step, hx: e}
 
     %__MODULE__{
       hy: n + steps,
       hx: e,
-      history: Enum.drop(Enum.reverse(path), 1) ++ h
+      history: Enum.reverse(path) ++ h
     }
   end
 
-  defp move("L", steps, %__MODULE__{hy: n, hx: e, history: h} = rope) do
+  defp move("L", steps, %__MODULE__{hy: n, hx: e, history: h}) do
     path = for step <- e..(e - steps), do: %{hy: n, hx: step}
 
     %__MODULE__{
       hy: n,
       hx: e - steps,
-      history: Enum.drop(Enum.reverse(path), 1) ++ h
+      history: Enum.reverse(path) ++ h
     }
   end
 
-  defp move("R", steps, %__MODULE__{hy: n, hx: e, history: h} = rope) do
+  defp move("R", steps, %__MODULE__{hy: n, hx: e, history: h}) do
     path = for step <- e..(e + steps), do: %{hy: n, hx: step}
 
     %__MODULE__{
       hy: n,
       hx: e + steps,
-      history: Enum.drop(Enum.reverse(path), 1) ++ h
+      history: Enum.reverse(path) ++ h
     }
   end
 end
