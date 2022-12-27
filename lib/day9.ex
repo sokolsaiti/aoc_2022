@@ -3,7 +3,7 @@ defmodule Aoc2022.Day9 do
 
   def process_input do
     content =
-      File.stream!("./input/day9.2.txt")
+      File.stream!("./input/day9.txt")
       |> Enum.map(fn x ->
         [direction, steps] = String.split(x)
         {direction, String.to_integer(steps)}
@@ -12,16 +12,14 @@ defmodule Aoc2022.Day9 do
         move(direction, steps, acc)
       end)
 
-    %{hx: x, hy: y, history: h} = content
+    %{hx: _x, hy: _y, history: h} = content
 
-    # tail_follow([%{hx: x, hy: y} | h])
-    IO.inspect(h)
+    part1 =
+      tail_follow(h)
+      |> Enum.uniq()
+      |> Enum.count()
 
-    IO.inspect(tail_follow(h))
-
-    tail_follow(h)
-    |> Enum.uniq()
-    |> Enum.count()
+    part1
   end
 
   def tail_follow(h) do
@@ -29,8 +27,8 @@ defmodule Aoc2022.Day9 do
     |> Enum.reduce([{0, 0}], fn %{hx: hx, hy: hy}, [{x, y} | _] = acc ->
       # diff = {abs(hx) - abs(x), abs(hy) - abs(y)}
       # {hx - x, hy - y} 4805, 5152, 5751
-      #dbg()
-      case {abs(hx) - abs(x), abs(hy) - abs(y)} do
+      # dbg()
+      case {hx - x, hy - y} do
         {0, 0} ->
           acc
 
@@ -47,19 +45,19 @@ defmodule Aoc2022.Day9 do
           acc
 
         {-1, -1} ->
-          #[{x - 1, y} | acc]
+          # [{x - 1, y} | acc]
           acc
 
         {1, -1} ->
-          #[{x + 1, y} | acc]
+          # [{x + 1, y} | acc]
           acc
 
         {-1, 1} ->
-          #[{x - 1, y} | acc]
+          # [{x - 1, y} | acc]
           acc
 
         {1, 1} ->
-          #[{x + 1, y} | acc]
+          # [{x + 1, y} | acc]
           acc
 
         {0, 2} ->
