@@ -1,5 +1,5 @@
 defmodule Aoc2022.Day9 do
-  defstruct hy: 0, hx: 0, history: [], tx: 0, ty: 0, thistory: []
+  defstruct hy: 0, hx: 0, history: []
 
   def process_input do
     content =
@@ -13,20 +13,31 @@ defmodule Aoc2022.Day9 do
       end)
 
     %{hx: _x, hy: _y, history: h} = content
+    tail_knot = tail_follow(h)
+    last_knot = knot_follow(tail_knot, 10)
+    IO.inspect(last_knot)
 
     part1 =
-      tail_follow(h)
+      tail_knot
       |> Enum.uniq()
       |> Enum.count()
 
     part1
   end
 
-  def tail_follow(h) do
+  defp knot_follow(h, knot_no) when knot_no > -1 do
+    IO.inspect(knot_no)
+    knot = tail_follow(h)
+    knot_follow(knot, knot_no - 1)
+  end
+
+  defp knot_follow(h, 0) do
+    h
+  end
+
+  defp tail_follow(h) do
     Enum.reverse(h)
-    |> Enum.reduce([{0, 0}], fn %{hx: hx, hy: hy}, [{x, y} | _] = acc ->
-      # diff = {abs(hx) - abs(x), abs(hy) - abs(y)}
-      # {hx - x, hy - y} 4805, 5152, 5751
+    |> Enum.reduce([%{hx: 0, hy: 0}], fn %{hx: hx, hy: hy}, [%{hx: x, hy: y} | _] = acc ->
       # dbg()
       case {hx - x, hy - y} do
         {0, 0} ->
@@ -45,56 +56,52 @@ defmodule Aoc2022.Day9 do
           acc
 
         {-1, -1} ->
-          # [{x - 1, y} | acc]
           acc
 
         {1, -1} ->
-          # [{x + 1, y} | acc]
           acc
 
         {-1, 1} ->
-          # [{x - 1, y} | acc]
           acc
 
         {1, 1} ->
-          # [{x + 1, y} | acc]
           acc
 
         {0, 2} ->
-          [{x, y + 1} | acc]
+          [%{hx: x, hy: y + 1} | acc]
 
         {0, -2} ->
-          [{x, y - 1} | acc]
+          [%{hx: x, hy: y - 1} | acc]
 
         {2, 0} ->
-          [{x + 1, y} | acc]
+          [%{hx: x + 1, hy: y} | acc]
 
         {-2, 0} ->
-          [{x - 1, y} | acc]
+          [%{hx: x - 1, hy: y} | acc]
 
         {2, 1} ->
-          [{x + 1, y + 1} | acc]
+          [%{hx: x + 1, hy: y + 1} | acc]
 
         {2, -1} ->
-          [{x + 1, y - 1} | acc]
+          [%{hx: x + 1, hy: y - 1} | acc]
 
         {-2, 1} ->
-          [{x - 1, y + 1} | acc]
+          [%{hx: x - 1, hy: y + 1} | acc]
 
         {-2, -1} ->
-          [{x - 1, y - 1} | acc]
+          [%{hx: x - 1, hy: y - 1} | acc]
 
         {1, 2} ->
-          [{x + 1, y + 1} | acc]
+          [%{hx: x + 1, hy: y + 1} | acc]
 
         {1, -2} ->
-          [{x + 1, y - 1} | acc]
+          [%{hx: x + 1, hy: y - 1} | acc]
 
         {-1, 2} ->
-          [{x - 1, y + 1} | acc]
+          [%{hx: x - 1, hy: y + 1} | acc]
 
         {-1, -2} ->
-          [{x - 1, y - 1} | acc]
+          [%{hx: x - 1, hy: y - 1} | acc]
       end
     end)
   end
