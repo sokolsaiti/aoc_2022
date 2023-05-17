@@ -3,7 +3,7 @@ defmodule Aoc2022.Day9 do
 
   def process_input do
     content =
-      File.stream!("./input/day9.txt")
+      File.stream!("./input/day9.2.txt")
       |> Enum.map(fn x ->
         [direction, steps] = String.split(x)
         {direction, String.to_integer(steps)}
@@ -14,7 +14,7 @@ defmodule Aoc2022.Day9 do
 
     %{hx: _x, hy: _y, history: h} = content
     tail_knot = tail_follow(h)
-    last_knot = knot_follow(tail_knot, 10)
+    last_knot = knot_follow(tail_knot, 3)
     IO.inspect(last_knot)
 
     part1 =
@@ -25,15 +25,19 @@ defmodule Aoc2022.Day9 do
     part1
   end
 
+  defp knot_follow(h, 0) do
+    h
+  end
+
   defp knot_follow(h, knot_no) when knot_no > -1 do
-    IO.inspect(knot_no)
+    #dbg(h)
+    #dbg(knot_no)
+    IO.inspect(h)
     knot = tail_follow(h)
     knot_follow(knot, knot_no - 1)
   end
 
-  defp knot_follow(h, 0) do
-    h
-  end
+
 
   defp tail_follow(h) do
     Enum.reverse(h)
