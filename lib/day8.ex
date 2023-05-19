@@ -138,7 +138,6 @@ defmodule Aoc2022.Day8 do
       |> Enum.map(fn {_, %{score: s}} -> s end)
       |> Enum.max()
 
-    IO.inspect(trees_with_visibility)
     {visible_count, highest_score}
   end
 
