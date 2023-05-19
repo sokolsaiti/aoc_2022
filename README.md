@@ -1,6 +1,9 @@
-# Aoc2022
+# Advent of Code 2022
 
-**TODO: Add description**
+## Description
+
+This is an attempt to solve the Advent of Code 2022 puzzles in Elixir language.
+
 
 ## Installation
 

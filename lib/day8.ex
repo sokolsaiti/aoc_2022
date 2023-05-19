@@ -8,7 +8,7 @@ defmodule Aoc2022.Day8 do
   """
 
   defmodule Tree do
-    defstruct height: nil, visible: false
+    defstruct height: nil, visible: false, score: 1
   end
 
   def process_input do
@@ -38,7 +38,7 @@ defmodule Aoc2022.Day8 do
         Map.merge(acc, x)
       end)
 
-    visible_edges =
+    trees_with_visibility =
       0..row_count
       |> Enum.map(fn i ->
         0..col_count
@@ -66,54 +66,60 @@ defmodule Aoc2022.Day8 do
 
             {row, column} ->
               %{height: current, visible: _v} = Map.get(trees, {i, j})
-              # IO.inspect(%{{row, column} => current})
 
-              left =
-                (column - 1)..0
-                |> Enum.map(fn x ->
-                  %{height: u, visible: _v} = Map.get(trees, {row, x})
+              trees_left = traverse_x(trees, column - 1, 0, row)
 
-                  u
-                end)
+              visibility_score_left =
+                trees_left
+                |> visibility_score(current)
+
+              visible_left? =
+                trees_left
                 |> Enum.filter(fn x -> current <= x end)
                 |> Enum.empty?()
 
-              # IO.inspect(left)
+              trees_right = traverse_x(trees, column + 1, col_count, row)
 
-              right =
-                (column + 1)..col_count
-                |> Enum.map(fn x ->
-                  %{height: d, visible: _v} = Map.get(trees, {row, x})
-                  d
-                end)
+              visibility_score_right =
+                trees_right
+                |> visibility_score(current)
+
+              visible_right? =
+                trees_right
                 |> Enum.filter(fn x -> current <= x end)
                 |> Enum.empty?()
 
-              # IO.inspect(right)
+              trees_up = traverse_y(trees, row - 1, 0, column)
 
-              up =
-                (row - 1)..0
-                |> Enum.map(fn x ->
-                  %{height: l, visible: _v} = Map.get(trees, {x, column})
-                  l
-                end)
+              visibility_score_up =
+                trees_up
+                |> visibility_score(current)
+
+              visible_up? =
+                trees_up
                 |> Enum.filter(fn x -> current <= x end)
                 |> Enum.empty?()
 
-              # IO.inspect(up)
+              trees_down = traverse_y(trees, row + 1, row_count, column)
 
-              down =
-                (row + 1)..row_count
-                |> Enum.map(fn x ->
-                  %{height: r, visible: _v} = Map.get(trees, {x, column})
-                  r
-                end)
+              visibility_score_down =
+                trees_down
+                |> visibility_score(current)
+
+              visible_down? =
+                trees_down
                 |> Enum.filter(fn x -> current <= x end)
                 |> Enum.empty?()
 
-              # IO.inspect(down)
-
-              %{{i, j} => %Tree{height: current, visible: up || down || left || right}}
+              %{
+                {i, j} => %Tree{
+                  height: current,
+                  visible: visible_up? || visible_down? || visible_left? || visible_right?,
+                  score:
+                    visibility_score_down * visibility_score_left * visibility_score_right *
+                      visibility_score_up
+                }
+              }
           end
         end)
       end)
@@ -122,8 +128,43 @@ defmodule Aoc2022.Day8 do
         Map.merge(w, acc)
       end)
 
-    visible_edges
-    |> Enum.filter(fn {_, %{height: _, visible: v}} -> v end)
-    |> Enum.count()
+    visible_count =
+      trees_with_visibility
+      |> Enum.filter(fn {_, %{height: _, visible: v}} -> v end)
+      |> Enum.count()
+
+    highest_score =
+      trees_with_visibility
+      |> Enum.map(fn {_, %{score: s}} -> s end)
+      |> Enum.max()
+
+    IO.inspect(trees_with_visibility)
+    {visible_count, highest_score}
+  end
+
+  defp traverse_x(trees, from, to, axis) do
+    from..to
+    |> Enum.map(fn x ->
+      %{height: u, visible: _v} = Map.get(trees, {axis, x})
+      u
+    end)
+  end
+
+  defp traverse_y(trees, from, to, axis) do
+    from..to
+    |> Enum.map(fn x ->
+      %{height: u, visible: _v} = Map.get(trees, {x, axis})
+      u
+    end)
+  end
+
+  defp visibility_score(trees, current) do
+    score =
+      trees
+      |> Enum.reduce_while(0, fn x, acc ->
+        if x >= current, do: {:halt, acc + 1}, else: {:cont, acc + 1}
+      end)
+
+    score
   end
 end
